@@ -1,13 +1,14 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GenerateContentResult, GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export const POST = async ( request: Request ) => {
-    const messages  = await request.json();
+    const messages = await request.json();
+    console.log(messages)
     const msg = messages.pop();
     const model = genAI.getGenerativeModel({ model: "gemini-pro"});
-     
+    
     const chat = model.startChat({
         history: messages,
         generationConfig: {
@@ -15,9 +16,8 @@ export const POST = async ( request: Request ) => {
         },
     });
 
-    const result = await chat.sendMessage(msg.parts);
+    const result: GenerateContentResult = await chat.sendMessage(msg.parts);
     const response = result.response;
-    const message = response;
-
-    return NextResponse.json( message , { status: 200 })
+   // console.log(result);
+    return NextResponse.json( response , { status: 200 })
 }

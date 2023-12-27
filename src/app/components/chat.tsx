@@ -38,11 +38,11 @@ export default function Chat(){
         })
 
         setLoading(false);
-
-        const { candidates } = await response.json();
+        const { candidates, text } = await response.json();
+        //console.log(text);
         const { content } = candidates[0];
-        const parts = content.parts[0].text;
-        const newGeminiMessage = {parts, role: content.role}
+        const { parts, role } = content;
+        const newGeminiMessage = {role, parts: parts[0].text};
         setMessages(prevData => [...prevData, newGeminiMessage]);
     }
 
@@ -50,9 +50,7 @@ export default function Chat(){
         <div className="w-4/5 h-full mx-auto flex flex-col justify-end gap-5">
             <div ref={chatListRef} className="overflow-y-auto">
             {
-                messages.map((message, i) => (                    
-                    <Message key={i} message={message} />
-                ))
+                messages.map((message, i) => <Message key={i} message={message} />)
             }
             </div>
             <div className="sticky bottom-1">
