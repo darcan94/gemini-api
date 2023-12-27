@@ -1,10 +1,13 @@
 'use client'
+import { useAutoScroll } from "@/utils/hooks/useScroll";
 import { FormEvent, KeyboardEvent, useRef, useState } from "react";
+import Message from "./ui/message";
 
 export default function Chat(){
     const formRef = useRef<HTMLFormElement>(null);
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState<any[]>([]);
+    const chatListRef = useAutoScroll(messages);
 
     function handleInputChange(evt: any){
         setInput(evt.target.value);
@@ -19,10 +22,7 @@ export default function Chat(){
 
     function handleSubmit(evt: FormEvent<HTMLFormElement>){
         evt.preventDefault()
-        const newMessage = {
-            role: 'user',
-            parts: input
-        }
+        const newMessage = {role: 'user', parts: input}
         const newMessages = [...messages, newMessage];
         setMessages(newMessages);
         setInput('');
@@ -44,19 +44,15 @@ export default function Chat(){
 
     return (
         <div className="w-4/5 h-full mx-auto flex flex-col justify-end gap-5">
-            <div>
+            <div ref={chatListRef} className="overflow-y-auto">
             {
                 messages.map((message, i) => (                    
-                    <div key={i} className={`chat ${message.role === 'user' 
-                    ? 'chat-end' : 'chat-start' }`}>
-                        <p className={`chat-bubble ${message.role === 'user'
-                    ? 'chat-bubble-primary': ''}`}>{message.parts}</p>
-                    </div>
+                    <Message key={i} message={message} />
                 ))
             }
             </div>
             <div className="sticky bottom-1">
-                <form ref={formRef} className="flex" onSubmit={handleSubmit}>
+                <form ref={formRef} className="flex justify-center" onSubmit={handleSubmit}>
                     <textarea
                         tabIndex={0}
                         rows={1}

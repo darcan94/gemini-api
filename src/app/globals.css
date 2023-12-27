@@ -25,3 +25,24 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+::-webkit-scrollbar {
+  width: 5px; /* Ancho del scrollbar */
+}
+
+/* Estilos para el thumb del scrollbar */
+::-webkit-scrollbar-thumb {
+  background-color: rgba(120, 120, 120, 0.1); /* Color del thumb */
+  border-radius: 5px; /* Borde redondeado del thumb */
+}
+
+/* Estilos para el thumb del scrollbar al hacer hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(170, 170, 170, 0.2); /* Color del thumb al hacer hover */
+  width: 12px;
+}
+
+/* Estilos para el track del scrollbar */
+::-webkit-scrollbar-track {
+  background-color: transparent; /* Color del track */
+}

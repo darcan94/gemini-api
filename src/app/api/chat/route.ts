@@ -4,8 +4,8 @@ import { NextResponse } from "next/server";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export const POST = async ( request: Request ) => {
-    const  messages  = await request.json();
-    const msg = messages.pop()
+    const messages  = await request.json();
+    const msg = messages.pop();
     const model = genAI.getGenerativeModel({ model: "gemini-pro"});
      
     const chat = model.startChat({
