@@ -1,12 +1,13 @@
 'use client'
-import { useAutoScroll } from "@/utils/hooks/useScroll";
+import { useAutoScroll } from "@/app/utils/hooks/useScroll";
 import { FormEvent, KeyboardEvent, useRef, useState } from "react";
-import Message from "./ui/message";
+import Message from "@/app/components/ui/message";
 
 export default function Chat(){
     const formRef = useRef<HTMLFormElement>(null);
     const [input, setInput] = useState('');
     const [messages, setMessages] = useState<any[]>([]);
+    const [isLoading, setLoading] = useState(false);
     const chatListRef = useAutoScroll(messages);
 
     function handleInputChange(evt: any){
@@ -22,6 +23,7 @@ export default function Chat(){
 
     function handleSubmit(evt: FormEvent<HTMLFormElement>){
         evt.preventDefault()
+        setLoading(true);
         const newMessage = {role: 'user', parts: input}
         const newMessages = [...messages, newMessage];
         setMessages(newMessages);
@@ -34,6 +36,8 @@ export default function Chat(){
             method: 'POST',
             body: JSON.stringify(messages)
         })
+
+        setLoading(false);
 
         const { candidates } = await response.json();
         const { content } = candidates[0];
@@ -52,7 +56,7 @@ export default function Chat(){
             }
             </div>
             <div className="sticky bottom-1">
-                <form ref={formRef} className="flex justify-center" onSubmit={handleSubmit}>
+                <form ref={formRef} className="flex justify-center gap-1" onSubmit={handleSubmit}>
                     <textarea
                         tabIndex={0}
                         rows={1}
@@ -63,7 +67,7 @@ export default function Chat(){
                         placeholder="Send a message"
                         >
                     </textarea>
-                    <button type='submit' className="btn btn-primary">Send</button>
+                    <button disabled={isLoading || input===''} type='submit' className="btn btn-primary">Send</button>
                 </form>
             </div>
         </div>

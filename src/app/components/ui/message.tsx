@@ -13,13 +13,14 @@ export default function Message({ message }: { message: any}) {
                     p({children}){
                         return <p className="mb-2 last:mb-0">{children}</p>
                     },
-                    code({ node, inline, className, children, ...props }){
+                    code({ node, className, children, ...props }){
                         const match = /language-(\w+)/.exec(className || "");
                         
-                        return !inline && match ? (
-                            <CodeBlock syntax={match[0]}>
-                                {String(children).replace(/\n$/, "")}
-                            </CodeBlock>
+                        return  match ? (
+                            <CodeBlock 
+                                syntax={match[1]} 
+                                value={String(children).replace(/\n$/, "")}
+                            />
                         ) : (
                             <code className={className} {...props}>
                                 {children}
