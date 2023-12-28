@@ -24,7 +24,7 @@ export default function Chat(){
     function handleSubmit(evt: FormEvent<HTMLFormElement>){
         evt.preventDefault()
         setLoading(true);
-        const newMessage = {role: 'user', parts: input}
+        const newMessage = {role: 'user', parts: [{text: input}]}
         const newMessages = [...messages, newMessage];
         setMessages(newMessages);
         setInput('');
@@ -38,11 +38,9 @@ export default function Chat(){
         })
 
         setLoading(false);
-        const { candidates, text } = await response.json();
-        //console.log(text);
-        const { content } = candidates[0];
-        const { parts, role } = content;
-        const newGeminiMessage = {role, parts: parts[0].text};
+        const { candidates } = await response.json();
+        const { parts, role } = candidates[0].content;
+        const newGeminiMessage = {role, parts: [{text: parts[0].text}]};
         setMessages(prevData => [...prevData, newGeminiMessage]);
     }
 

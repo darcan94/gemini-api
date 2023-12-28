@@ -4,6 +4,7 @@ import CodeBlock from "./codeBlock";
 
 export default function Message({ message }: { message: any}) {
  const user = message.role === 'user';
+ console.log(message);
  return(
     <div className={`chat ${user ? 'chat-end' : 'chat-start' }`}>
         <div className={`chat-bubble ${user ? 'chat-bubble-primary': ''}`}>
@@ -28,7 +29,7 @@ export default function Message({ message }: { message: any}) {
                         );
                     }
                 }}>
-                    {message.parts}
+                    {message.parts[0].text}
             </MemoizedMarkdown>        
         </div>
     </div>

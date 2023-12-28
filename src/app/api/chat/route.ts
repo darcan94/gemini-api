@@ -3,21 +3,14 @@ import { NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
-export const POST = async ( request: Request ) => {
-    const messages = await request.json();
-    console.log(messages)
-    const msg = messages.pop();
-    const model = genAI.getGenerativeModel({ model: "gemini-pro"});
-    
-    const chat = model.startChat({
-        history: messages,
-        generationConfig: {
-            maxOutputTokens: 500,
-        },
-    });
+export const runtime = 'edge';
 
-    const result: GenerateContentResult = await chat.sendMessage(msg.parts);
-    const response = result.response;
-   // console.log(result);
+export const POST = async ( request: Request ) => {
+    const contents = await request.json();
+
+    const { response }: GenerateContentResult = await genAI
+            .getGenerativeModel({ model: "gemini-pro"})
+            .generateContent({contents});
+ 
     return NextResponse.json( response , { status: 200 })
 }
