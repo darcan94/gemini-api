@@ -20,8 +20,7 @@ export default function Message({ message }: { message: any}) {
                         return  match ? (
                             <CodeBlock 
                                 syntax={match[1]} 
-                                value={String(children).replace(/\n$/, "")}
-                            />
+                                value={String(children).replace(/\n$/, "")}/>
                         ) : (
                             <code className={className} {...props}>
                                 {children}
