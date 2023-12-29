@@ -32,11 +32,12 @@ export default function Chat(){
             method: 'POST',
             body: JSON.stringify(messages)
         });
+        setLoading(false);
+        const { candidates } = await response.json();
+        const { parts, role } = candidates[0].content;
+        const newGeminiMessage = {role, parts: [{ text: parts[0].text }]};
+        setMessages(prevData => [...prevData, newGeminiMessage]);
 
-         const { candidates } = await response.json();
-         const { parts, role } = candidates[0].content;
-         const newGeminiMessage = {role, parts: [{ text: parts[0].text }]};
-         setMessages(prevData => [...prevData, newGeminiMessage]);
     }
 
     return (
