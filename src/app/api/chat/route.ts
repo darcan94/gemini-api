@@ -1,5 +1,4 @@
-import { GenerateContentResponse, GenerateContentResult, GenerateContentStreamResult, GoogleGenerativeAI } from "@google/generative-ai";
-import { NextResponse } from "next/server";
+import { GenerateContentStreamResult, GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
@@ -8,16 +7,14 @@ export const runtime = 'edge';
 export const POST = async ( request: Request ) => {
     const contents = await request.json();
 
-    const  response : GenerateContentStreamResult = await genAI
+    const  { response, stream } : GenerateContentStreamResult = await genAI
             .getGenerativeModel({ model: "gemini-pro"})
             .generateContentStream({contents});
     
-    //for await(const chunk of response.stream) {
-    //    console.log(chunk.candidates![0].content);
-   // }
-    const stream = GoogleGenerativeAIStream(response);
-    console.log(stream)
-    return NextResponse.json( await response.response , { status: 200 })
+    const aiStream: ReadableStream = GoogleGenerativeAIStream(stream);
+    
+    return new Response(aiStream);
+   // return NextResponse.json( await response , { status: 200 })
 }
 
 
@@ -38,9 +35,10 @@ function readableFromAsyncIterable<T>(iterable: AsyncIterable<T>) {
   }
 
   
-async function* streamable2(response: any): AsyncGenerator<string> {
-    for await (const chunk of response.stream) {
+async function* streamable2(response: AsyncGenerator<any>): AsyncGenerator<string> {
+    for await (const chunk of response) {
         const parts = chunk.candidates[0].content?.parts;
+
         if (parts === undefined) {
             continue;
         }
@@ -52,40 +50,22 @@ async function* streamable2(response: any): AsyncGenerator<string> {
 }
 
 
-function GoogleGenerativeAIStream(response: any, cb = null) {
+function GoogleGenerativeAIStream(response: AsyncGenerator<any>, cb = null) {
     return readableFromAsyncIterable(streamable2(response))
 }
 
-var StreamingTextResponse = class extends Response {
-    constructor(res: any, init: any, data: any) {
+class StreamingTextResponse extends Response {
+    constructor(res: ReadableStream, init?: ResponseInit, data?: any) {
         let processedStream = res;
+
         if (data) {
             processedStream = res.pipeThrough(data.stream);
         }
-        super(processedStream, {
-            ...init,
-            status: 200,
-            headers: {
-                "Content-Type": "text/plain; charset=utf-8",
-                ["X-Experimental-Stream-Data"]: data ? "true" : "false",
-                ...init == null ? void 0 : init.headers
-            }
-        });
+
+        const headers = new Headers(init?.headers);
+        headers.set("Content-Type", "text/plain; charset=utf-8");
+        headers.set("X-Experimental-Stream-Data", data ? "true" : "false");
+
+        super(processedStream, {...init, status: 200, headers });
     }
 };
-/*async function* streamable(stream: any) {
-  for await (const chunk of stream) {
-    if ("completion" in chunk) {
-      const text = chunk.completion;
-      if (text)
-        yield text;
-    } else if ("delta" in chunk) {
-      const { delta } = chunk;
-      if ("text" in delta) {
-        const text = delta.text;
-        if (text)
-          yield text;
-      }
-    }
-  }
-}*/
