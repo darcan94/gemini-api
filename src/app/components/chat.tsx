@@ -31,22 +31,12 @@ export default function Chat(){
         const response = await fetch('/api/chat', {
             method: 'POST',
             body: JSON.stringify(messages)
-        })
-        //console.log(response.body)
-        const reader = response.body?.getReader();
-        let text = '';
-        let receivedData = await reader?.read();
+        });
 
-        while(!receivedData?.done){
-            text += new TextDecoder("utf-8").decode(receivedData?.value);
-            console.log(text)
-            receivedData = await reader?.read();
-        }
-        setLoading(false);
-//        const { candidates } = await response.json();
-//        const { parts, role } = candidates[0].content;
-//        const newGeminiMessage = {role, parts: [{text: parts[0].text}]};
-//        setMessages(prevData => [...prevData, newGeminiMessage]);
+         const { candidates } = await response.json();
+         const { parts, role } = candidates[0].content;
+         const newGeminiMessage = {role, parts: [{ text: parts[0].text }]};
+         setMessages(prevData => [...prevData, newGeminiMessage]);
     }
 
     return (

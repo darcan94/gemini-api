@@ -1,4 +1,5 @@
 import { GenerateContentStreamResult, GoogleGenerativeAI } from "@google/generative-ai";
+import { NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
@@ -13,8 +14,8 @@ export const POST = async ( request: Request ) => {
     
     const aiStream: ReadableStream = GoogleGenerativeAIStream(stream);
     
-    return new Response(aiStream);
-   // return NextResponse.json( await response , { status: 200 })
+    //return new Response(aiStream;
+    return NextResponse.json( await response , { status: 200 })
 }
 
 
@@ -50,7 +51,7 @@ async function* streamable2(response: AsyncGenerator<any>): AsyncGenerator<strin
 }
 
 
-function GoogleGenerativeAIStream(response: AsyncGenerator<any>, cb = null) {
+function GoogleGenerativeAIStream(response: AsyncGenerator<any>) {
     return readableFromAsyncIterable(streamable2(response))
 }
 
