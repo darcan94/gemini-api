@@ -8,14 +8,11 @@ export const runtime = 'edge';
 export const POST = async ( request: Request ) => {
     const contents = await request.json();
 
-    const  { response, stream } : GenerateContentStreamResult = await genAI
+    const  { stream } : GenerateContentStreamResult = await genAI
             .getGenerativeModel({ model: "gemini-pro"})
             .generateContentStream({contents});
-    
-    const aiStream: ReadableStream = GoogleGenerativeAIStream(stream);
-    
-    //return new Response(aiStream;
-    return NextResponse.json( await response , { status: 200 })
+
+    return new Response(GoogleGenerativeAIStream(stream));
 }
 
 

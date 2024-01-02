@@ -21,23 +21,35 @@ export default function Chat(){
         evt.preventDefault()
         setLoading(true);
         const newMessage = {role: 'user', parts: [{text: input}]}
-        const newMessages = [...messages, newMessage];
+        const newMessages = [...messages, newMessage ];
         setMessages(newMessages);
         setInput('');
-        sentMessages(newMessages);
+        sendPrompts(newMessages);
     }
 
-    const sentMessages = async (messages: any[]) => {
+    const sendPrompts = async (messages: any[]) => {
         const response = await fetch('/api/chat', {
             method: 'POST',
             body: JSON.stringify(messages)
         });
         setLoading(false);
-        const { candidates } = await response.json();
-        const { parts, role } = candidates[0].content;
-        const newGeminiMessage = {role, parts: [{ text: parts[0].text }]};
-        setMessages(prevData => [...prevData, newGeminiMessage]);
-
+        
+        /**
+         * ------------- With Stream -----------------
+         *  const reader = response.body?.getReader();
+            let receivedData = await reader?.read();
+            let text = '';
+            while(!receivedData?.done){
+            text += new TextDecoder("utf-8").decode(receivedData?.value);
+            receivedData = await reader?.read();
+        }
+         */        
+        
+        /**
+         *  ------------ Without Stream --------------*/
+            const newGeminiMessage = {role: 'model', parts: [{ text: await response.text() }]};
+            setMessages(prevData => [...prevData, newGeminiMessage]);      
+        
     }
 
     return (
