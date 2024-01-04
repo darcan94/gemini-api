@@ -32,23 +32,30 @@ export default function Chat(){
             method: 'POST',
             body: JSON.stringify(messages)
         });
+
         setLoading(false);
         
+        if(!response.ok){
+            throw new Error(
+                await response.text() || "Failed to fetch the chat response."
+            );
+        }
         /**
          * ------------- With Stream -----------------
          *  const reader = response.body?.getReader();
+         *  cons decoder = new TextDecoder("utf-8");
             let receivedData = await reader?.read();
             let text = '';
             while(!receivedData?.done){
-            text += new TextDecoder("utf-8").decode(receivedData?.value);
+            text += decoder.decode(receivedData?.value);
             receivedData = await reader?.read();
         }
          */        
         
         /**
          *  ------------ Without Stream --------------*/
-            const newGeminiMessage = {role: 'model', parts: [{ text: await response.text() }]};
-            setMessages(prevData => [...prevData, newGeminiMessage]);      
+        const newGeminiMessage = {role: 'model', parts: [{ text: await response.text() }]};
+        setMessages(prevData => [...prevData, newGeminiMessage]);      
         
     }
 
@@ -60,7 +67,7 @@ export default function Chat(){
             <div className="sticky bottom-1">
                 <form ref={formRef} className="flex justify-center gap-1" onSubmit={handleSubmit}>
                     <textarea
-                        tabIndex={0}
+                        autoFocus={true}
                         rows={1}
                         className="textarea w-11/12 resize-none px-4 py-[.5rem] text-font outline-none sm:text-sm"
                         onKeyDown={(evt) => handleKeyDown(evt)}
