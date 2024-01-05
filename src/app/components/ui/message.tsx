@@ -1,8 +1,9 @@
 import remarkGfm from "remark-gfm";
 import { MemoizedMarkdown } from "./memoizedMarkdown";
 import CodeBlock from "./codeBlock";
+import { IMessage } from "@/app/definitions/definitions";
 
-export default function Message({ message }: { message: any}) {
+export default function Message({ message }: { message: IMessage}) {
  const user = message.role === 'user';
  return(
     <div className={`chat ${user ? 'chat-end' : 'chat-start' }`}>
@@ -27,7 +28,7 @@ export default function Message({ message }: { message: any}) {
                         );
                     }
                 }}>
-                    {message.parts[0].text}
+                    {message.content}
             </MemoizedMarkdown>        
         </div>
     </div>

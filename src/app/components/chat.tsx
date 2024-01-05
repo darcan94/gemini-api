@@ -1,14 +1,19 @@
 'use client'
 import { useAutoScroll } from "@/app/utils/hooks/useScroll";
 import { FormEvent, KeyboardEvent, useRef, useState } from "react";
-import Message from "@/app/components/ui/message";
+import { nanoid } from "nanoid";
+import { IMessage } from "../definitions/definitions";
+import Message from "./ui/message";
 
+const generateId = () => nanoid(7);
 export default function Chat(){
     const formRef = useRef<HTMLFormElement>(null);
     const [input, setInput] = useState('');
-    const [messages, setMessages] = useState<any[]>([]);
+    const [messages, setMessages] = useState<IMessage[]>([]);
     const [isLoading, setLoading] = useState(false);
     const chatListRef = useAutoScroll(messages);
+
+    
 
     const handleKeyDown = (evt: KeyboardEvent<HTMLTextAreaElement>): void => {
         if (evt.key === "Enter" && !evt.shiftKey) {
@@ -20,20 +25,24 @@ export default function Chat(){
     function handleSubmit(evt: FormEvent<HTMLFormElement>){
         evt.preventDefault()
         setLoading(true);
-        const newMessage = {role: 'user', parts: [{text: input}]}
-        const newMessages = [...messages, newMessage ];
+        const newMessage: IMessage = {
+            id: generateId(),
+            role: 'user', 
+            content: input,
+            createdAt: new Date()
+        }
+        const newMessages: IMessage[] = [...messages, newMessage ];
         setMessages(newMessages);
         setInput('');
         sendPrompts(newMessages);
     }
 
-    const sendPrompts = async (messages: any[]) => {
+    const sendPrompts = async (messages: IMessage[]) => {
         const response = await fetch('/api/chat', {
             method: 'POST',
             body: JSON.stringify(messages)
         });
 
-        setLoading(false);
         
         if(!response.ok){
             throw new Error(
@@ -54,9 +63,14 @@ export default function Chat(){
         
         /**
          *  ------------ Without Stream --------------*/
-        const newGeminiMessage = {role: 'model', parts: [{ text: await response.text() }]};
+        const newGeminiMessage: IMessage = {
+            id: generateId(),
+            role: 'model', 
+            content: await response.text() ,
+            createdAt: new Date() 
+        };
         setMessages(prevData => [...prevData, newGeminiMessage]);      
-        
+        setLoading(false);
     }
 
     return (
