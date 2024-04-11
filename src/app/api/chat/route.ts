@@ -1,5 +1,5 @@
 import { IMessage } from "@/app/definitions/definitions";
-import { GoogleGenerativeAIStream } from "@/app/utils/functions/ai";
+import { generativeAIStream } from "@/app/utils/functions/ai";
 import { GenerateContentStreamResult, GoogleGenerativeAI } from "@google/generative-ai";
 
 
@@ -21,5 +21,18 @@ export const POST = async ( request: Request ) => {
             .getGenerativeModel({ model: "gemini-pro"})
             .generateContentStream(buildGoogleGenAiprompt(contents));
 
-    return new Response(GoogleGenerativeAIStream(stream));
+    const encoder = new TextEncoder();
+    const readableStream = new ReadableStream({
+        async start(controller){
+            for await (const chunk of stream){
+                const chunkText = chunk.text();
+                controller.enqueue(encoder.encode(chunkText));
+            }
+            controller.close();
+        }
+    });
+
+    return new Response(readableStream, { 
+        headers: { 'Content-Type': 'text/plain'}
+    });
 }

@@ -1,4 +1,4 @@
-export function GoogleGenerativeAIStream(response: AsyncGenerator<any>) {
+export function generativeAIStream(response: AsyncGenerator<any>) {
     return readableFromAsyncIterable(streamable2(response))
 }
 
