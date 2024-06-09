@@ -1,9 +1,9 @@
 'use client'
-import { useAutoScroll } from "@/app/utils/hooks/useScroll";
+import { useAutoScroll } from "@/app/hooks/useScroll";
 import { FormEvent, KeyboardEvent, useRef, useState } from "react";
 import { nanoid } from "nanoid";
-import { IMessage } from "../definitions/definitions";
-import Message from "./ui/message";
+import { IMessage } from "@/app/definitions/definitions";
+import Message from "@/app/components/ui/message";
 
 const generateId = () => nanoid(7);
 export default function Chat(){
@@ -49,28 +49,22 @@ export default function Chat(){
                 await response.text() || "Failed to fetch the chat response."
             );
         }
-        /**
-         * ------------- With Stream -----------------
-         *  const reader = response.body?.getReader();
-         *  cons decoder = new TextDecoder("utf-8");
+       
+         // ------------- With Stream -----------------
+           const reader = response.body?.getReader();
+           const decoder = new TextDecoder("utf-8");
             let receivedData = await reader?.read();
             let text = '';
             while(!receivedData?.done){
-            text += decoder.decode(receivedData?.value);
-            receivedData = await reader?.read();
-        }
-         */        
-        
-        /**
-         *  ------------ Without Stream --------------*/
-        const newGeminiMessage: IMessage = {
-            id: generateId(),
-            role: 'model', 
-            content: await response.text() ,
-            createdAt: new Date() 
-        };
-        setMessages(prevData => [...prevData, newGeminiMessage]);      
-        setLoading(false);
+                text += decoder.decode(receivedData?.value);
+                setMessages([
+                    ...messages,
+                    {role: 'model', content: text}
+                ])
+                receivedData = await reader?.read();
+            }  
+
+            setLoading(false);
     }
 
     return (

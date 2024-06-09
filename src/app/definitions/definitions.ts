@@ -1,6 +1,6 @@
 export interface IMessage{
-    id: string;
+    id?: string;
     content: string;
     role: 'user' | 'model';
-    createdAt: Date;
+    createdAt?: Date;
 }

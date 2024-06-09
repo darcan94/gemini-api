@@ -1,5 +1,4 @@
 import { IMessage } from "@/app/definitions/definitions";
-import { generativeAIStream } from "@/app/utils/functions/ai";
 import { GenerateContentStreamResult, GoogleGenerativeAI } from "@google/generative-ai";
 
 
