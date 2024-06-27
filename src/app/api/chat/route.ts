@@ -17,7 +17,7 @@ export const POST = async ( request: Request ) => {
     const contents = await request.json();
 
     const  { stream } : GenerateContentStreamResult = await genAI
-            .getGenerativeModel({ model: "gemini-pro"})
+            .getGenerativeModel({ model: "gemini-1.5-flash"})
             .generateContentStream(buildGoogleGenAiprompt(contents));
 
     const encoder = new TextEncoder();
